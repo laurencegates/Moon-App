@@ -28,26 +28,14 @@ jobs:
       - name: Build APK File
         run: flutter build apk --release
 
-      #   - name: Push to Releases
-      #     uses: ncipollo/release-action@v1
-      #     with:
-      #       artifacts: "build/app/outputs/apk/release/*"
-      #       # artifacts: "build/app/outputs/apk/debug/*"
-      #       # tag: v0.0.63
-      #       tag: v0.0.${{github.run_number}}
-      #       token: ${{ secrets.REPO_TOKEN }}
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Push to Releases
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: v0.0.${{ github.run_number }}
-          release_name: Release v0.0.${{ github.run_number }}
-          #   files: |
-          #     build/app/outputs/apk/release/app-release.apk
-          #   token: ${{ secrets.REPO_TOKEN }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+          artifacts: "build/app/outputs/apk/release/*"
+          # artifacts: "build/app/outputs/apk/debug/*"
+          # tag: v0.0.63
+          tag: v0.0.${{github.run_number}}
+          token: ${{ secrets.REPO_TOKEN }}
 
       - name: Decode google-services.json
         env:
@@ -59,31 +47,17 @@ jobs:
           firebase_options_dart: ${{secrets.FIREBASE_OPTION}}
         run: echo "$firebase_options_dart" > lib/firebase_options.dart
 
-      #   - name: Upload Artifact
-      #     uses: actions/upload-artifact@v3
-      #     with:
-      #       name: release-apk
-      #       path: build/app/outputs/apk/release/app-release.apk
-      # path: build/app/outputs/apk/debug/app-release.apk
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-apk
+          path: build/app/outputs/apk/release/app-release.apk
 
-      - name: Set up Firebase CLI
-        run: |
-          curl -sL https://firebase.tools | bash
-          firebase --version
-
-      - name: Authenticate with Firebase
-        run: firebase login:ci --interactive
-
-      - name: Upload APK to Firebase App Distribution
-        run: |
-          firebase appdistribution:distribute "build/app/outputs/apk/release/app-release.apk" --app ${{ secrets.APPID }} --token ${{ secrets.FIREBASE_TOKEN }} --groups "tester-group"
-
-    #   - name: Move APK to Firebase App Distribution
-    #     uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
-    #     with:
-    #       appId: ${{secrets.APPID}}
-    #       token: ${{secrets.FIREBASE_TOKEN}}
-    #       groups: tester-group
-    #       file:
-    #         build/app/outputs/apk/release/app-release.apk
-    # file: build/app/outputs/apk/debug/app-release.apk
+      - name: Move APK to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
+        with:
+          appId: ${{secrets.APPID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: tester-group
+          file:
+            build/app/outputs/apk/release/app-release.apk
